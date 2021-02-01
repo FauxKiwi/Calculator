@@ -67,6 +67,26 @@ public interface MathListener extends ParseTreeListener {
 	 */
 	void exitPrintStatement(MathParser.PrintStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MathParser#functionDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionDeclaration(MathParser.FunctionDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#functionDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionDeclaration(MathParser.FunctionDeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MathParser#formalParameters}.
+	 * @param ctx the parse tree
+	 */
+	void enterFormalParameters(MathParser.FormalParametersContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#formalParameters}.
+	 * @param ctx the parse tree
+	 */
+	void exitFormalParameters(MathParser.FormalParametersContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MathParser#expression}.
 	 * @param ctx the parse tree
 	 */
@@ -126,6 +146,16 @@ public interface MathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunction(MathParser.FunctionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MathParser#parameters}.
+	 * @param ctx the parse tree
+	 */
+	void enterParameters(MathParser.ParametersContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#parameters}.
+	 * @param ctx the parse tree
+	 */
+	void exitParameters(MathParser.ParametersContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MathParser#functionName}.
 	 * @param ctx the parse tree

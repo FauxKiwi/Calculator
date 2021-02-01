@@ -46,6 +46,18 @@ public interface MathVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrintStatement(MathParser.PrintStatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MathParser#functionDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionDeclaration(MathParser.FunctionDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MathParser#formalParameters}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFormalParameters(MathParser.FormalParametersContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MathParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -81,6 +93,12 @@ public interface MathVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFunction(MathParser.FunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MathParser#parameters}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParameters(MathParser.ParametersContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MathParser#functionName}.
 	 * @param ctx the parse tree

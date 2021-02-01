@@ -20,6 +20,7 @@ statements
 
 statement
     : defStatement
+    | functionDeclaration
     | printStatement
     ;
 
@@ -29,6 +30,17 @@ defStatement
 
 printStatement
     : PRINT expression
+    ;
+
+functionDeclaration
+    : IDENTIFIER
+    ( LPAREN formalParameters RPAREN EQ
+    | COLON formalParameters ARROW
+    ) expression
+    ;
+
+formalParameters
+    : IDENTIFIER (COMMA IDENTIFIER)*
     ;
 
 // Expressions
@@ -59,6 +71,11 @@ primary
 
 function
     : functionName primary
+    | IDENTIFIER LPAREN parameters RPAREN
+    ;
+
+parameters
+    : expression (COMMA expression)*
     ;
 
 functionName
@@ -121,6 +138,9 @@ REM:            '/R';
 EQ:             '=';
 NEQ:            '!=';
 DEF:            ':=';
+COLON:          ':';
+ARROW:          '|->' | '->';
+COMMA:          ',';
 
 SEMI:           ';';
 LPAREN:         '(';

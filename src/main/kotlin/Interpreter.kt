@@ -22,33 +22,54 @@ class Interpreter : MathVisitor<Double> {
     }
 
     override fun visitProgram(ctx: MathParser.ProgramContext): Double {
-        TODO("Not yet implemented")
+        return ctx.statements()?.let(::visitStatements) ?: Double.NaN
     }
 
     override fun visitCalculation(ctx: MathParser.CalculationContext): Double =
         visitExpression(ctx.expression())
 
     override fun visitStatements(ctx: MathParser.StatementsContext): Double {
-        TODO("Not yet implemented")
+        var res = Double.NaN
+        ctx.statement().forEach { res = visitStatement(it) }
+        return res
     }
 
-    override fun visitStatement(ctx: MathParser.StatementContext): Double {
-        TODO("Not yet implemented")
-    }
+    override fun visitStatement(ctx: MathParser.StatementContext): Double =
+        ctx.defStatement()?.let(::visitDefStatement) ?:
+        ctx.functionDeclaration()?.let(::visitFunctionDeclaration) ?:
+        visitPrintStatement(ctx.printStatement())
+
+    private var definitions = hashMapOf<String, Double>()
 
     override fun visitDefStatement(ctx: MathParser.DefStatementContext): Double {
-        TODO("Not yet implemented")
+        return visitExpression(ctx.expression()).also { definitions[ctx.IDENTIFIER().text] = it }
     }
 
     override fun visitPrintStatement(ctx: MathParser.PrintStatementContext): Double {
-        TODO("Not yet implemented")
+        return visitExpression(ctx.expression()).also { println(it) }
+    }
+
+    private val functions = hashMapOf<String, DefinedFunction>()
+    private data class DefinedFunction(val expression: MathParser.ExpressionContext, val parameters: List<String>)
+    private var currentFormalParameters = mutableListOf<String>()
+
+    override fun visitFunctionDeclaration(ctx: MathParser.FunctionDeclarationContext): Double {
+        visitFormalParameters(ctx.formalParameters())
+        functions[ctx.IDENTIFIER().text] = DefinedFunction(ctx.expression(), currentFormalParameters)
+        return Double.NaN
+    }
+
+    override fun visitFormalParameters(ctx: MathParser.FormalParametersContext): Double {
+        currentFormalParameters = mutableListOf()
+        ctx.IDENTIFIER().forEach { currentFormalParameters.add(it.text) }
+        return Double.NaN
     }
 
     override fun visitExpression(ctx: MathParser.ExpressionContext): Double =
-        ctx.sum()?.let { visitSum(it) } ?:
+        ctx.sum()?.let(::visitSum) ?:
         visitPrimary(ctx.primary())
 
-    private var currentOperation: BinOp = { _, _ -> 0.0} //Useless
+    private var currentOperation: BinOp = { _, _ -> Double.NaN}
 
     override fun visitSum(ctx: MathParser.SumContext): Double {
         var intermediate = visitProduct(ctx.product(0))
@@ -83,15 +104,38 @@ class Interpreter : MathVisitor<Double> {
             ctx.expression()?.let { visitExpression(it) } ?:
             ctx.function()?.let { visitFunction(it) } ?:
             visitValue(ctx.value())
-        val multiplier = ctx.postfix()?.let { visitPostfix(it) } ?: 1.0
+        val multiplier = ctx.postfix()?.let(::visitPostfix) ?: 1.0
         return value * multiplier * sign
     }
 
-    private var currentFunction: Function = {0.0} //Useless
+    private var currentFunction: Function = {Double.NaN}
+    private var currentParameters = mutableListOf<Double>()
 
+    @Suppress("Unchecked_Cast")
     override fun visitFunction(ctx: MathParser.FunctionContext): Double {
-        visitFunctionName(ctx.functionName())
-        return currentFunction(visitPrimary(ctx.primary()))
+        ctx.functionName()?.let {
+            visitFunctionName(ctx.functionName())
+            return currentFunction(visitPrimary(ctx.primary()))
+        }
+        val fn = functions[ctx.IDENTIFIER().text]!!
+        val cachedDefinitions = definitions.clone() as HashMap<String, Double>
+
+        visitParameters(ctx.parameters())
+
+        fn.parameters.forEachIndexed { i, s ->
+            definitions[s] = currentParameters[i]
+        }
+
+        val res = visitExpression(fn.expression)
+
+        definitions = cachedDefinitions
+        return res
+    }
+
+    override fun visitParameters(ctx: MathParser.ParametersContext): Double {
+        currentParameters = mutableListOf()
+        ctx.expression().forEach { currentParameters.add(visitExpression(it)) }
+        return Double.NaN
     }
 
     override fun visitFunctionName(ctx: MathParser.FunctionNameContext): Double {
@@ -116,14 +160,10 @@ class Interpreter : MathVisitor<Double> {
         0.01
 
     override fun visitValue(ctx: MathParser.ValueContext): Double =
-        ctx.NUMBER()?.let { ctx.NUMBER().text.toDouble() } ?:
+        ctx.NUMBER()?.text?.toDouble() ?:
         ctx.constant()?.let { visitConstant(it) } ?:
-        TODO()
-
-    /*override fun visitNumber(ctx: MathParser.NumberContext): Double {
-        val sign = if(ctx.MINUS().size % 2 == 0) 1 else -1
-        return ctx.NUMBER().text.toDouble() * sign
-    }*/
+        definitions[ctx.IDENTIFIER().text] ?:
+        error("Not defined")
 
     override fun visitConstant(ctx: MathParser.ConstantContext): Double =
         ctx.PI()?.let { kotlin.math.PI } ?:
@@ -133,7 +173,7 @@ class Interpreter : MathVisitor<Double> {
         currentOperation =
             ctx.PLUS()?.let { PLUS } ?:
             MINUS
-        return 0.0 //Useless
+        return Double.NaN
     }
 
     override fun visitProductOp(ctx: MathParser.ProductOpContext): Double {
@@ -142,7 +182,7 @@ class Interpreter : MathVisitor<Double> {
             ctx.INT_DIV()?.let { INT_DIV } ?:
             ctx.REM()?.let { REM } ?:
             TIMES
-        return 0.0 //Useless
+        return Double.NaN
     }
 }
 
