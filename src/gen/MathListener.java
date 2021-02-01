@@ -197,6 +197,16 @@ public interface MathListener extends ParseTreeListener {
 	 */
 	void exitValue(MathParser.ValueContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MathParser#vector}.
+	 * @param ctx the parse tree
+	 */
+	void enterVector(MathParser.VectorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#vector}.
+	 * @param ctx the parse tree
+	 */
+	void exitVector(MathParser.VectorContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MathParser#constant}.
 	 * @param ctx the parse tree
 	 */

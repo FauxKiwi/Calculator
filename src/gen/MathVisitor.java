@@ -124,6 +124,12 @@ public interface MathVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitValue(MathParser.ValueContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MathParser#vector}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVector(MathParser.VectorContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MathParser#constant}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

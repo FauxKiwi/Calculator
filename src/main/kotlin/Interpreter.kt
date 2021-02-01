@@ -4,48 +4,48 @@ import org.antlr.v4.runtime.tree.RuleNode
 import org.antlr.v4.runtime.tree.TerminalNode
 import kotlin.math.*
 
-class Interpreter : MathVisitor<Double> {
-    override fun visit(p0: ParseTree): Double {
+class Interpreter : MathVisitor<CalculatorValue> {
+    override fun visit(p0: ParseTree): CalculatorValue {
         TODO("Not yet implemented")
     }
 
-    override fun visitChildren(p0: RuleNode): Double {
+    override fun visitChildren(p0: RuleNode): CalculatorValue {
         TODO("Not yet implemented")
     }
 
-    override fun visitTerminal(p0: TerminalNode): Double {
+    override fun visitTerminal(p0: TerminalNode): CalculatorValue {
         TODO("Not yet implemented")
     }
 
-    override fun visitErrorNode(p0: ErrorNode): Double {
+    override fun visitErrorNode(p0: ErrorNode): CalculatorValue {
         TODO("Not yet implemented")
     }
 
-    override fun visitProgram(ctx: MathParser.ProgramContext): Double {
-        return ctx.statements()?.let(::visitStatements) ?: Double.NaN
+    override fun visitProgram(ctx: MathParser.ProgramContext): CalculatorValue {
+        return ctx.statements()?.let(::visitStatements) ?: Number(Double.NaN)
     }
 
-    override fun visitCalculation(ctx: MathParser.CalculationContext): Double =
+    override fun visitCalculation(ctx: MathParser.CalculationContext): CalculatorValue =
         visitExpression(ctx.expression())
 
-    override fun visitStatements(ctx: MathParser.StatementsContext): Double {
-        var res = Double.NaN
-        ctx.statement().forEach { res = visitStatement(it) }
+    override fun visitStatements(ctx: MathParser.StatementsContext): CalculatorValue {
+        var res = Number(Double.NaN)
+        ctx.statement().forEach { res = visitStatement(it) as Number }
         return res
     }
 
-    override fun visitStatement(ctx: MathParser.StatementContext): Double =
+    override fun visitStatement(ctx: MathParser.StatementContext): CalculatorValue =
         ctx.defStatement()?.let(::visitDefStatement) ?:
         ctx.functionDeclaration()?.let(::visitFunctionDeclaration) ?:
         visitPrintStatement(ctx.printStatement())
 
-    private var definitions = hashMapOf<String, Double>()
+    private var definitions = hashMapOf<String, CalculatorValue>()
 
-    override fun visitDefStatement(ctx: MathParser.DefStatementContext): Double {
+    override fun visitDefStatement(ctx: MathParser.DefStatementContext): CalculatorValue {
         return visitExpression(ctx.expression()).also { definitions[ctx.IDENTIFIER().text] = it }
     }
 
-    override fun visitPrintStatement(ctx: MathParser.PrintStatementContext): Double {
+    override fun visitPrintStatement(ctx: MathParser.PrintStatementContext): CalculatorValue {
         return visitExpression(ctx.expression()).also { println(it) }
     }
 
@@ -53,25 +53,25 @@ class Interpreter : MathVisitor<Double> {
     private data class DefinedFunction(val expression: MathParser.ExpressionContext, val parameters: List<String>)
     private var currentFormalParameters = mutableListOf<String>()
 
-    override fun visitFunctionDeclaration(ctx: MathParser.FunctionDeclarationContext): Double {
+    override fun visitFunctionDeclaration(ctx: MathParser.FunctionDeclarationContext): CalculatorValue {
         visitFormalParameters(ctx.formalParameters())
         functions[ctx.IDENTIFIER().text] = DefinedFunction(ctx.expression(), currentFormalParameters)
-        return Double.NaN
+        return Number(Double.NaN)
     }
 
-    override fun visitFormalParameters(ctx: MathParser.FormalParametersContext): Double {
+    override fun visitFormalParameters(ctx: MathParser.FormalParametersContext): CalculatorValue {
         currentFormalParameters = mutableListOf()
         ctx.IDENTIFIER().forEach { currentFormalParameters.add(it.text) }
-        return Double.NaN
+        return Number(Double.NaN)
     }
 
-    override fun visitExpression(ctx: MathParser.ExpressionContext): Double =
+    override fun visitExpression(ctx: MathParser.ExpressionContext): CalculatorValue =
         ctx.sum()?.let(::visitSum) ?:
         visitPrimary(ctx.primary())
 
-    private var currentOperation: BinOp = { _, _ -> Double.NaN}
+    private var currentOperation: BinOp = { _, _ -> Number(Double.NaN)}
 
-    override fun visitSum(ctx: MathParser.SumContext): Double {
+    override fun visitSum(ctx: MathParser.SumContext): CalculatorValue {
         var intermediate = visitProduct(ctx.product(0))
         repeat(ctx.product().size - 1) { i ->
             visitSumOp(ctx.sumOp(i))
@@ -80,7 +80,7 @@ class Interpreter : MathVisitor<Double> {
         return intermediate
     }
 
-    override fun visitProduct(ctx: MathParser.ProductContext): Double {
+    override fun visitProduct(ctx: MathParser.ProductContext): CalculatorValue {
         var intermediate = visitPower(ctx.power(0))
         repeat(ctx.power().size - 1) { i ->
             visitProductOp(ctx.productOp(i))
@@ -89,7 +89,7 @@ class Interpreter : MathVisitor<Double> {
         return intermediate
     }
 
-    override fun visitPower(ctx: MathParser.PowerContext): Double {
+    override fun visitPower(ctx: MathParser.PowerContext): CalculatorValue {
         var intermediate = visitPrimary(ctx.primary(0))
         currentOperation = POW
         repeat(ctx.primary().size - 1) { i ->
@@ -98,27 +98,27 @@ class Interpreter : MathVisitor<Double> {
         return intermediate
     }
 
-    override fun visitPrimary(ctx: MathParser.PrimaryContext): Double {
-        val sign = if(ctx.MINUS().size % 2 == 0) 1 else -1
+    override fun visitPrimary(ctx: MathParser.PrimaryContext): CalculatorValue {
+        val sign = Number(if(ctx.MINUS().size % 2 == 0) 1.0 else -1.0)
         val value =
             ctx.expression()?.let { visitExpression(it) } ?:
             ctx.function()?.let { visitFunction(it) } ?:
             visitValue(ctx.value())
-        val multiplier = ctx.postfix()?.let(::visitPostfix) ?: 1.0
+        val multiplier = ctx.postfix()?.let(::visitPostfix) ?: Number(1.0)
         return value * multiplier * sign
     }
 
-    private var currentFunction: Function = {Double.NaN}
-    private var currentParameters = mutableListOf<Double>()
+    private var currentFunction: Function = {Number(Double.NaN)}
+    private var currentParameters = mutableListOf<CalculatorValue>()
 
     @Suppress("Unchecked_Cast")
-    override fun visitFunction(ctx: MathParser.FunctionContext): Double {
+    override fun visitFunction(ctx: MathParser.FunctionContext): CalculatorValue {
         ctx.functionName()?.let {
             visitFunctionName(ctx.functionName())
             return currentFunction(visitPrimary(ctx.primary()))
         }
         val fn = functions[ctx.IDENTIFIER().text]!!
-        val cachedDefinitions = definitions.clone() as HashMap<String, Double>
+        val cachedDefinitions = definitions.clone() as HashMap<String, CalculatorValue>
 
         visitParameters(ctx.parameters())
 
@@ -132,72 +132,79 @@ class Interpreter : MathVisitor<Double> {
         return res
     }
 
-    override fun visitParameters(ctx: MathParser.ParametersContext): Double {
+    override fun visitParameters(ctx: MathParser.ParametersContext): CalculatorValue {
         currentParameters = mutableListOf()
         ctx.expression().forEach { currentParameters.add(visitExpression(it)) }
-        return Double.NaN
+        return Number(Double.NaN)
     }
 
-    override fun visitFunctionName(ctx: MathParser.FunctionNameContext): Double {
+    override fun visitFunctionName(ctx: MathParser.FunctionNameContext): CalculatorValue {
         currentFunction =
-            ctx.SIN()?.let { ::sin } ?:
-            ctx.COS()?.let { ::cos } ?:
-            ctx.TAN()?.let { ::tan } ?:
+            ctx.SIN()?.let {{ Number(sin((it as Number).double)) }} ?:
+            ctx.COS()?.let {{ Number(sin((it as Number).double)) }} ?:
+            ctx.TAN()?.let {{ Number(sin((it as Number).double)) }} ?:
             ctx.log()?.let { log(visitLog(it)) } ?:
-            ctx.LG()?.let { ::log10 } ?:
-            ctx.LN()?.let { ::ln } ?:
-            ::exp
-        return 0.0 //Useless
+            ctx.LG()?.let {{ Number(sin((it as Number).double)) }} ?:
+            ctx.LN()?.let {{ Number(sin((it as Number).double)) }} ?:
+            { Number(exp((it as Number).double)) }
+        return Number(Double.NaN)
     }
 
-    override fun visitLog(ctx: MathParser.LogContext): Double =
+    override fun visitLog(ctx: MathParser.LogContext): CalculatorValue =
         visitPrimary(ctx.primary())
 
-    override fun visitPostfix(ctx: MathParser.PostfixContext): Double =
+    override fun visitPostfix(ctx: MathParser.PostfixContext): CalculatorValue =
         ctx.deg?.let { DEGREES } ?:
-        ctx.rad?.let { 1.0 } ?:
+        ctx.rad?.let { RADS } ?:
         ctx.gra?.let { GRADS } ?:
-        0.01
+        PERCENT
 
-    override fun visitValue(ctx: MathParser.ValueContext): Double =
-        ctx.NUMBER()?.text?.toDouble() ?:
+    override fun visitValue(ctx: MathParser.ValueContext): CalculatorValue =
+        ctx.NUMBER()?.text?.let { Number(it) } ?:
         ctx.constant()?.let { visitConstant(it) } ?:
         definitions[ctx.IDENTIFIER().text] ?:
         error("Not defined")
 
-    override fun visitConstant(ctx: MathParser.ConstantContext): Double =
-        ctx.PI()?.let { kotlin.math.PI } ?:
+    override fun visitVector(ctx: MathParser.VectorContext): CalculatorValue {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitConstant(ctx: MathParser.ConstantContext): CalculatorValue =
+        ctx.PI()?.let { NUM_PI } ?:
         error("")
 
-    override fun visitSumOp(ctx: MathParser.SumOpContext): Double {
+    override fun visitSumOp(ctx: MathParser.SumOpContext): CalculatorValue {
         currentOperation =
             ctx.PLUS()?.let { PLUS } ?:
             MINUS
-        return Double.NaN
+        return Number(Double.NaN)
     }
 
-    override fun visitProductOp(ctx: MathParser.ProductOpContext): Double {
+    override fun visitProductOp(ctx: MathParser.ProductOpContext): CalculatorValue {
         currentOperation =
             ctx.DIV()?.let { DIV } ?:
-            ctx.INT_DIV()?.let { INT_DIV } ?:
-            ctx.REM()?.let { REM } ?:
+            //ctx.INT_DIV()?.let { INT_DIV } ?:
+            //ctx.REM()?.let { REM } ?:
             TIMES
-        return Double.NaN
+        return Number(Double.NaN)
     }
 }
 
-typealias BinOp = (Double, Double) -> Double
-typealias Function = (Double) -> Double
+typealias BinOp = (CalculatorValue, CalculatorValue) -> CalculatorValue
+typealias Function = (CalculatorValue) -> CalculatorValue
 
 val PLUS: BinOp = { x, y -> x + y}
 val MINUS: BinOp = { x, y -> x - y}
 val TIMES: BinOp = { x, y -> x * y}
 val DIV: BinOp = { x, y -> x / y}
-val INT_DIV: BinOp = { x, y -> (x.toInt() / y.toInt()).toDouble()}
-val REM: BinOp = { x, y -> (x.toInt() % y.toInt()).toDouble()}
+//val INT_DIV: BinOp = { x, y -> (x.toInt() / y.toInt()).toDouble()}
+//val REM: BinOp = { x, y -> (x.toInt() % y.toInt()).toDouble()}
 val POW: BinOp = { x, y -> x.pow(y) }
 
-fun log(base: Double): Function = { x -> log(x, base) }
+fun log(base: CalculatorValue): Function = { x -> Number(log((x as Number).double, (base as Number).double)) }
 
-const val DEGREES = PI / 180.0
-const val GRADS = PI / 200.0
+val NUM_PI = Number(PI)
+val DEGREES = Number(PI / 180.0)
+val RADS = Number(1.0)
+val GRADS = Number(PI / 200.0)
+val PERCENT = Number(0.01)

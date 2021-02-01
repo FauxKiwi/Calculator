@@ -102,8 +102,13 @@ postfix
 
 value
     : NUMBER
+    | vector
     | constant
     | IDENTIFIER
+    ;
+
+vector
+    : LSQUARE value (COMMA value)* RSQUARE
     ;
 
 constant
@@ -119,8 +124,8 @@ sumOp
 productOp
     : TIMES
     | DIV
-    | INT_DIV
-    | REM
+    //| INT_DIV
+    //| REM
     ;
 
 //
@@ -133,14 +138,15 @@ TIMES:          '*';
 DIV:            '/';
 POW:            '^';
 INDEX:          '_';
-INT_DIV:        '/I';
-REM:            '/R';
+//INT_DIV:        '/I';
+//REM:            '/R';
 EQ:             '=';
 NEQ:            '!=';
 DEF:            ':=';
 COLON:          ':';
 ARROW:          '|->' | '->';
 COMMA:          ',';
+DOT:            '·';
 
 SEMI:           ';';
 LPAREN:         '(';
