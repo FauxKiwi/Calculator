@@ -70,6 +70,12 @@ public interface MathVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSum(MathParser.SumContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MathParser#dotProduct}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDotProduct(MathParser.DotProductContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MathParser#product}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

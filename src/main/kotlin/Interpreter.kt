@@ -72,13 +72,19 @@ class Interpreter : MathVisitor<CalculatorValue> {
     private var currentOperation: BinOp = { _, _ -> Number(Double.NaN)}
 
     override fun visitSum(ctx: MathParser.SumContext): CalculatorValue {
-        var intermediate = visitProduct(ctx.product(0))
-        repeat(ctx.product().size - 1) { i ->
+        var intermediate = visitDotProduct(ctx.dotProduct(0))
+        repeat(ctx.dotProduct().size - 1) { i ->
             visitSumOp(ctx.sumOp(i))
-            intermediate = currentOperation(intermediate, visitProduct(ctx.product(i + 1)))
+            intermediate = currentOperation(intermediate, visitDotProduct(ctx.dotProduct(i + 1)))
         }
         return intermediate
     }
+
+    override fun visitDotProduct(ctx: MathParser.DotProductContext): CalculatorValue =
+        ctx.dot?.let {
+            visitProduct(ctx.product(0)) dot visitProduct(ctx.product(1))
+        } ?:
+        visitProduct(ctx.product(0))
 
     override fun visitProduct(ctx: MathParser.ProductContext): CalculatorValue {
         var intermediate = visitPower(ctx.power(0))

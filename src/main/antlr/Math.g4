@@ -50,7 +50,11 @@ expression
     ;
 
 sum
-    : product (sumOp product)*
+    : dotProduct (sumOp dotProduct)*
+    ;
+
+dotProduct
+    : product (dot=('dot' | DOT) product)?
     ;
 
 product
@@ -97,6 +101,7 @@ postfix
     | rad='rad'
     | gra='gra'
     | PERCENT
+    | PERMILLE
     ;
 
 
@@ -124,8 +129,6 @@ sumOp
 productOp
     : TIMES
     | DIV
-    //| INT_DIV
-    //| REM
     ;
 
 //
@@ -134,17 +137,15 @@ productOp
 
 PLUS:           '+';
 MINUS:          '-';
-TIMES:          '*';
-DIV:            '/';
+TIMES:          '*' | '×';
+DIV:            '/' | '÷';
 POW:            '^';
 INDEX:          '_';
-//INT_DIV:        '/I';
-//REM:            '/R';
 EQ:             '=';
 NEQ:            '!=';
 DEF:            ':=';
 COLON:          ':';
-ARROW:          '|->' | '->';
+ARROW:          '->' | '|->';
 COMMA:          ',';
 DOT:            '·';
 
@@ -156,6 +157,7 @@ RSQUARE:        ']';
 
 DEGREES:        '°';
 PERCENT:        '%';
+PERMILLE:       '%%' | '‰';
 
 PRINT:          'print';
 

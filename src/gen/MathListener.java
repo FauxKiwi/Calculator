@@ -107,6 +107,16 @@ public interface MathListener extends ParseTreeListener {
 	 */
 	void exitSum(MathParser.SumContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MathParser#dotProduct}.
+	 * @param ctx the parse tree
+	 */
+	void enterDotProduct(MathParser.DotProductContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#dotProduct}.
+	 * @param ctx the parse tree
+	 */
+	void exitDotProduct(MathParser.DotProductContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MathParser#product}.
 	 * @param ctx the parse tree
 	 */

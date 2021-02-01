@@ -135,6 +135,18 @@ public class MathBaseListener implements MathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterDotProduct(MathParser.DotProductContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDotProduct(MathParser.DotProductContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterProduct(MathParser.ProductContext ctx) { }
 	/**
 	 * {@inheritDoc}
