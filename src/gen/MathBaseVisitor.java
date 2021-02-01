@@ -114,14 +114,14 @@ public class MathBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements M
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitValue(MathParser.ValueContext ctx) { return visitChildren(ctx); }
+	@Override public T visitPostfix(MathParser.PostfixContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNumber(MathParser.NumberContext ctx) { return visitChildren(ctx); }
+	@Override public T visitValue(MathParser.ValueContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

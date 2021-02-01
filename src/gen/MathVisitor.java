@@ -94,17 +94,17 @@ public interface MathVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLog(MathParser.LogContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MathParser#postfix}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPostfix(MathParser.PostfixContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MathParser#value}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitValue(MathParser.ValueContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MathParser#number}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNumber(MathParser.NumberContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MathParser#constant}.
 	 * @param ctx the parse tree

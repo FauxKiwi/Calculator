@@ -50,9 +50,11 @@ power
     ;
 
 primary
-    : LPAREN expression RPAREN
+    : (PLUS | MINUS)*
+    ( LPAREN expression RPAREN
     | function
     | value
+    ) postfix?
     ;
 
 function
@@ -70,18 +72,21 @@ functionName
     ;
 
 log
-    : LOG primary
+    : LOG INDEX primary
+    ;
+
+postfix
+    : deg=(DEGREES | 'deg')
+    | rad='rad'
+    | gra='gra'
+    | PERCENT
     ;
 
 
 value
-    : number
+    : NUMBER
     | constant
     | IDENTIFIER
-    ;
-
-number
-    : (PLUS | MINUS)* NUMBER
     ;
 
 constant
@@ -110,6 +115,7 @@ MINUS:          '-';
 TIMES:          '*';
 DIV:            '/';
 POW:            '^';
+INDEX:          '_';
 INT_DIV:        '/I';
 REM:            '/R';
 EQ:             '=';
@@ -122,17 +128,21 @@ RPAREN:         ')';
 LSQUARE:        '[';
 RSQUARE:        ']';
 
+DEGREES:        '°';
+PERCENT:        '%';
+
 PRINT:          'print';
+
 SIN:            'sin';
 COS:            'cos';
 TAN:            'tan';
-LOG:            'log_';
+LOG:            'log';
 LG:             'lg';
 LN:             'ln';
 EXP:            'e^';
-PI:             'pi' | 'π';
+PI:             'pi' | 'PI' | 'π';
 
-RESERVED:       'log';
+//RESERVED:       'log';
 
 NUMBER
     : Digits ('.' Digits)? Exponent?

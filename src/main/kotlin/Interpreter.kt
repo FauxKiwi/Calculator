@@ -77,10 +77,15 @@ class Interpreter : MathVisitor<Double> {
         return intermediate
     }
 
-    override fun visitPrimary(ctx: MathParser.PrimaryContext): Double =
-        ctx.expression()?.let { visitExpression(it) } ?:
-        ctx.function()?.let { visitFunction(it) } ?:
-        visitValue(ctx.value())
+    override fun visitPrimary(ctx: MathParser.PrimaryContext): Double {
+        val sign = if(ctx.MINUS().size % 2 == 0) 1 else -1
+        val value =
+            ctx.expression()?.let { visitExpression(it) } ?:
+            ctx.function()?.let { visitFunction(it) } ?:
+            visitValue(ctx.value())
+        val multiplier = ctx.postfix()?.let { visitPostfix(it) } ?: 1.0
+        return value * multiplier * sign
+    }
 
     private var currentFunction: Function = {0.0} //Useless
 
@@ -104,15 +109,21 @@ class Interpreter : MathVisitor<Double> {
     override fun visitLog(ctx: MathParser.LogContext): Double =
         visitPrimary(ctx.primary())
 
+    override fun visitPostfix(ctx: MathParser.PostfixContext): Double =
+        ctx.deg?.let { DEGREES } ?:
+        ctx.rad?.let { 1.0 } ?:
+        ctx.gra?.let { GRADS } ?:
+        0.01
+
     override fun visitValue(ctx: MathParser.ValueContext): Double =
-        ctx.number()?.let { visitNumber(it) } ?:
+        ctx.NUMBER()?.let { ctx.NUMBER().text.toDouble() } ?:
         ctx.constant()?.let { visitConstant(it) } ?:
         TODO()
 
-    override fun visitNumber(ctx: MathParser.NumberContext): Double {
+    /*override fun visitNumber(ctx: MathParser.NumberContext): Double {
         val sign = if(ctx.MINUS().size % 2 == 0) 1 else -1
         return ctx.NUMBER().text.toDouble() * sign
-    }
+    }*/
 
     override fun visitConstant(ctx: MathParser.ConstantContext): Double =
         ctx.PI()?.let { kotlin.math.PI } ?:
@@ -147,3 +158,6 @@ val REM: BinOp = { x, y -> (x.toInt() % y.toInt()).toDouble()}
 val POW: BinOp = { x, y -> x.pow(y) }
 
 fun log(base: Double): Function = { x -> log(x, base) }
+
+const val DEGREES = PI / 180.0
+const val GRADS = PI / 200.0

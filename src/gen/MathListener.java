@@ -147,6 +147,16 @@ public interface MathListener extends ParseTreeListener {
 	 */
 	void exitLog(MathParser.LogContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MathParser#postfix}.
+	 * @param ctx the parse tree
+	 */
+	void enterPostfix(MathParser.PostfixContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#postfix}.
+	 * @param ctx the parse tree
+	 */
+	void exitPostfix(MathParser.PostfixContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MathParser#value}.
 	 * @param ctx the parse tree
 	 */
@@ -156,16 +166,6 @@ public interface MathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitValue(MathParser.ValueContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MathParser#number}.
-	 * @param ctx the parse tree
-	 */
-	void enterNumber(MathParser.NumberContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MathParser#number}.
-	 * @param ctx the parse tree
-	 */
-	void exitNumber(MathParser.NumberContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MathParser#constant}.
 	 * @param ctx the parse tree
