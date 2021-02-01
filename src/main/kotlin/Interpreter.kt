@@ -29,8 +29,8 @@ class Interpreter : MathVisitor<CalculatorValue> {
         visitExpression(ctx.expression())
 
     override fun visitStatements(ctx: MathParser.StatementsContext): CalculatorValue {
-        var res = Number(Double.NaN)
-        ctx.statement().forEach { res = visitStatement(it) as Number }
+        var res: CalculatorValue = Number(Double.NaN)
+        ctx.statement().forEach { res = visitStatement(it) }
         return res
     }
 
@@ -161,12 +161,17 @@ class Interpreter : MathVisitor<CalculatorValue> {
 
     override fun visitValue(ctx: MathParser.ValueContext): CalculatorValue =
         ctx.NUMBER()?.text?.let { Number(it) } ?:
+        ctx.vector()?.let(::visitVector) ?:
         ctx.constant()?.let { visitConstant(it) } ?:
         definitions[ctx.IDENTIFIER().text] ?:
         error("Not defined")
 
     override fun visitVector(ctx: MathParser.VectorContext): CalculatorValue {
-        TODO("Not yet implemented")
+        val primaries = ctx.primary()
+        val values = DoubleArray(primaries.size) { i ->
+            (visitPrimary(primaries[i]) as Number).double
+        }
+        return Vector(values)
     }
 
     override fun visitConstant(ctx: MathParser.ConstantContext): CalculatorValue =

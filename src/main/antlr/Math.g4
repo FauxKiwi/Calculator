@@ -108,7 +108,7 @@ value
     ;
 
 vector
-    : LSQUARE value (COMMA value)* RSQUARE
+    : LSQUARE primary (COMMA primary)* RSQUARE
     ;
 
 constant

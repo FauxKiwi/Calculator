@@ -1465,11 +1465,11 @@ public class MathParser extends Parser {
 
 	public static class VectorContext extends ParserRuleContext {
 		public TerminalNode LSQUARE() { return getToken(MathParser.LSQUARE, 0); }
-		public List<ValueContext> value() {
-			return getRuleContexts(ValueContext.class);
+		public List<PrimaryContext> primary() {
+			return getRuleContexts(PrimaryContext.class);
 		}
-		public ValueContext value(int i) {
-			return getRuleContext(ValueContext.class,i);
+		public PrimaryContext primary(int i) {
+			return getRuleContext(PrimaryContext.class,i);
 		}
 		public TerminalNode RSQUARE() { return getToken(MathParser.RSQUARE, 0); }
 		public List<TerminalNode> COMMA() { return getTokens(MathParser.COMMA); }
@@ -1505,7 +1505,7 @@ public class MathParser extends Parser {
 			setState(192);
 			match(LSQUARE);
 			setState(193);
-			value();
+			primary();
 			setState(198);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -1515,7 +1515,7 @@ public class MathParser extends Parser {
 				setState(194);
 				match(COMMA);
 				setState(195);
-				value();
+				primary();
 				}
 				}
 				setState(200);
@@ -1744,13 +1744,13 @@ public class MathParser extends Parser {
 		"\u00ba\u00b8\3\2\2\2\u00ba\u00b9\3\2\2\2\u00bb%\3\2\2\2\u00bc\u00c1\7"+
 		"#\2\2\u00bd\u00c1\5(\25\2\u00be\u00c1\5*\26\2\u00bf\u00c1\7$\2\2\u00c0"+
 		"\u00bc\3\2\2\2\u00c0\u00bd\3\2\2\2\u00c0\u00be\3\2\2\2\u00c0\u00bf\3\2"+
-		"\2\2\u00c1\'\3\2\2\2\u00c2\u00c3\7\26\2\2\u00c3\u00c8\5&\24\2\u00c4\u00c5"+
-		"\7\21\2\2\u00c5\u00c7\5&\24\2\u00c6\u00c4\3\2\2\2\u00c7\u00ca\3\2\2\2"+
-		"\u00c8\u00c6\3\2\2\2\u00c8\u00c9\3\2\2\2\u00c9\u00cb\3\2\2\2\u00ca\u00c8"+
-		"\3\2\2\2\u00cb\u00cc\7\27\2\2\u00cc)\3\2\2\2\u00cd\u00ce\7\"\2\2\u00ce"+
-		"+\3\2\2\2\u00cf\u00d0\t\2\2\2\u00d0-\3\2\2\2\u00d1\u00d2\t\4\2\2\u00d2"+
-		"/\3\2\2\2\25\61=CI\\ejr{\u0083\u0089\u0092\u0095\u009f\u00a6\u00b0\u00ba"+
-		"\u00c0\u00c8";
+		"\2\2\u00c1\'\3\2\2\2\u00c2\u00c3\7\26\2\2\u00c3\u00c8\5\32\16\2\u00c4"+
+		"\u00c5\7\21\2\2\u00c5\u00c7\5\32\16\2\u00c6\u00c4\3\2\2\2\u00c7\u00ca"+
+		"\3\2\2\2\u00c8\u00c6\3\2\2\2\u00c8\u00c9\3\2\2\2\u00c9\u00cb\3\2\2\2\u00ca"+
+		"\u00c8\3\2\2\2\u00cb\u00cc\7\27\2\2\u00cc)\3\2\2\2\u00cd\u00ce\7\"\2\2"+
+		"\u00ce+\3\2\2\2\u00cf\u00d0\t\2\2\2\u00d0-\3\2\2\2\u00d1\u00d2\t\4\2\2"+
+		"\u00d2/\3\2\2\2\25\61=CI\\ejr{\u0083\u0089\u0092\u0095\u009f\u00a6\u00b0"+
+		"\u00ba\u00c0\u00c8";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

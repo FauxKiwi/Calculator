@@ -7,11 +7,7 @@ fun main() {
     """.trimIndent()
 
     val program = """
-        f: x |-> x^2;
-        print f(8);
-        x := 7;
-        print f(5);
-        print x
+        print [1] + [2]
     """.trimIndent()
 
     val lexer = MathLexer(CharStreams.fromString(program))

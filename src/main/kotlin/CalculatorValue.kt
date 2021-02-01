@@ -30,11 +30,17 @@ inline class Vector(val values: DoubleArray) : CalculatorValue {
 
     override operator fun plus(other: CalculatorValue) = Vector(values.addToEach((other as Vector).values))
     override operator fun minus(other: CalculatorValue) = Vector(values.subtractFromEach((other as Vector).values))
-    override operator fun times(other: CalculatorValue) = Vector(doubleArrayOf(
-        values[1]*(other as Vector).values[2]-values[2]*other.values[1],
-        values[2]*other.values[0]-values[0]*other.values[2],
-        values[0]*other.values[1]-values[1]*other.values[0]
-    ))
+    override operator fun times(other: CalculatorValue) = when (other) {
+        is Number -> Vector(values.multiplyEachWith(other.double))
+        is Vector -> Vector(
+            doubleArrayOf(
+                values[1] * other.values[2] - values[2] * other.values[1],
+                values[2] * other.values[0] - values[0] * other.values[2],
+                values[0] * other.values[1] - values[1] * other.values[0]
+            )
+        )
+        else -> error("Unknown Subclass")
+    }
     override fun div(other: CalculatorValue): CalculatorValue { error("Cannot divide Vectors") }
     override infix fun dot(other: CalculatorValue): CalculatorValue {
         var ir = 0.0
@@ -50,17 +56,19 @@ inline class Vector(val values: DoubleArray) : CalculatorValue {
 }
 
 inline fun DoubleArray.addToEach(other: DoubleArray): DoubleArray {
-    val out = DoubleArray(size)
-    repeat(size) { i ->
-        out[i] = get(i) + other[i]
+    return DoubleArray(size) { i ->
+        get(i) + other[i]
     }
-    return out
 }
 
 inline fun DoubleArray.subtractFromEach(other: DoubleArray): DoubleArray {
-    val out = DoubleArray(size)
-    repeat(size) { i ->
-        out[i] = get(i) - other[i]
+    return DoubleArray(size) { i ->
+        get(i) - other[i]
     }
-    return out
+}
+
+inline fun DoubleArray.multiplyEachWith(double: Double): DoubleArray {
+    return DoubleArray(size) { i ->
+        get(i) * double
+    }
 }
