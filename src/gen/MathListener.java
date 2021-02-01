@@ -117,15 +117,45 @@ public interface MathListener extends ParseTreeListener {
 	 */
 	void exitPrimary(MathParser.PrimaryContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MathParser#numberOrVar}.
+	 * Enter a parse tree produced by {@link MathParser#function}.
 	 * @param ctx the parse tree
 	 */
-	void enterNumberOrVar(MathParser.NumberOrVarContext ctx);
+	void enterFunction(MathParser.FunctionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MathParser#numberOrVar}.
+	 * Exit a parse tree produced by {@link MathParser#function}.
 	 * @param ctx the parse tree
 	 */
-	void exitNumberOrVar(MathParser.NumberOrVarContext ctx);
+	void exitFunction(MathParser.FunctionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MathParser#functionName}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionName(MathParser.FunctionNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#functionName}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionName(MathParser.FunctionNameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MathParser#log}.
+	 * @param ctx the parse tree
+	 */
+	void enterLog(MathParser.LogContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#log}.
+	 * @param ctx the parse tree
+	 */
+	void exitLog(MathParser.LogContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MathParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void enterValue(MathParser.ValueContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void exitValue(MathParser.ValueContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MathParser#number}.
 	 * @param ctx the parse tree
@@ -136,6 +166,16 @@ public interface MathListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNumber(MathParser.NumberContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MathParser#constant}.
+	 * @param ctx the parse tree
+	 */
+	void enterConstant(MathParser.ConstantContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#constant}.
+	 * @param ctx the parse tree
+	 */
+	void exitConstant(MathParser.ConstantContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MathParser#sumOp}.
 	 * @param ctx the parse tree

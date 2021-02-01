@@ -76,17 +76,41 @@ public interface MathVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrimary(MathParser.PrimaryContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MathParser#numberOrVar}.
+	 * Visit a parse tree produced by {@link MathParser#function}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNumberOrVar(MathParser.NumberOrVarContext ctx);
+	T visitFunction(MathParser.FunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MathParser#functionName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionName(MathParser.FunctionNameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MathParser#log}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLog(MathParser.LogContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MathParser#value}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitValue(MathParser.ValueContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MathParser#number}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitNumber(MathParser.NumberContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MathParser#constant}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConstant(MathParser.ConstantContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MathParser#sumOp}.
 	 * @param ctx the parse tree

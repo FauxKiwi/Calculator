@@ -51,16 +51,41 @@ power
 
 primary
     : LPAREN expression RPAREN
-    | numberOrVar
+    | function
+    | value
     ;
 
-numberOrVar
+function
+    : functionName primary
+    ;
+
+functionName
+    : SIN
+    | COS
+    | TAN
+    | log
+    | LG
+    | LN
+    | EXP
+    ;
+
+log
+    : LOG primary
+    ;
+
+
+value
     : number
+    | constant
     | IDENTIFIER
     ;
 
 number
     : (PLUS | MINUS)* NUMBER
+    ;
+
+constant
+    : PI
     ;
 
 
@@ -101,11 +126,13 @@ PRINT:          'print';
 SIN:            'sin';
 COS:            'cos';
 TAN:            'tan';
-LOG:            'log';
+LOG:            'log_';
 LG:             'lg';
 LN:             'ln';
-EULER:          'e^';
+EXP:            'e^';
 PI:             'pi' | 'π';
+
+RESERVED:       'log';
 
 NUMBER
     : Digits ('.' Digits)? Exponent?
@@ -120,7 +147,7 @@ fragment Digits
     ;
 
 IDENTIFIER
-    : [a-zA-Z_]+
+    : [a-zA-Z]+
     ;
 
 WHITESPACE

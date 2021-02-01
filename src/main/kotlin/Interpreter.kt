@@ -2,7 +2,7 @@ import org.antlr.v4.runtime.tree.ErrorNode
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.RuleNode
 import org.antlr.v4.runtime.tree.TerminalNode
-import kotlin.math.pow
+import kotlin.math.*
 
 class Interpreter : MathVisitor<Double> {
     override fun visit(p0: ParseTree): Double {
@@ -48,7 +48,7 @@ class Interpreter : MathVisitor<Double> {
         ctx.sum()?.let { visitSum(it) } ?:
         visitPrimary(ctx.primary())
 
-    private var currentOperation: Operation = { _, _ -> 0.0} //Useless
+    private var currentOperation: BinOp = { _, _ -> 0.0} //Useless
 
     override fun visitSum(ctx: MathParser.SumContext): Double {
         var intermediate = visitProduct(ctx.product(0))
@@ -79,10 +79,34 @@ class Interpreter : MathVisitor<Double> {
 
     override fun visitPrimary(ctx: MathParser.PrimaryContext): Double =
         ctx.expression()?.let { visitExpression(it) } ?:
-        visitNumberOrVar(ctx.numberOrVar())
+        ctx.function()?.let { visitFunction(it) } ?:
+        visitValue(ctx.value())
 
-    override fun visitNumberOrVar(ctx: MathParser.NumberOrVarContext): Double =
+    private var currentFunction: Function = {0.0} //Useless
+
+    override fun visitFunction(ctx: MathParser.FunctionContext): Double {
+        visitFunctionName(ctx.functionName())
+        return currentFunction(visitPrimary(ctx.primary()))
+    }
+
+    override fun visitFunctionName(ctx: MathParser.FunctionNameContext): Double {
+        currentFunction =
+            ctx.SIN()?.let { ::sin } ?:
+            ctx.COS()?.let { ::cos } ?:
+            ctx.TAN()?.let { ::tan } ?:
+            ctx.log()?.let { log(visitLog(it)) } ?:
+            ctx.LG()?.let { ::log10 } ?:
+            ctx.LN()?.let { ::ln } ?:
+            ::exp
+        return 0.0 //Useless
+    }
+
+    override fun visitLog(ctx: MathParser.LogContext): Double =
+        visitPrimary(ctx.primary())
+
+    override fun visitValue(ctx: MathParser.ValueContext): Double =
         ctx.number()?.let { visitNumber(it) } ?:
+        ctx.constant()?.let { visitConstant(it) } ?:
         TODO()
 
     override fun visitNumber(ctx: MathParser.NumberContext): Double {
@@ -90,27 +114,36 @@ class Interpreter : MathVisitor<Double> {
         return ctx.NUMBER().text.toDouble() * sign
     }
 
+    override fun visitConstant(ctx: MathParser.ConstantContext): Double =
+        ctx.PI()?.let { kotlin.math.PI } ?:
+        error("")
+
     override fun visitSumOp(ctx: MathParser.SumOpContext): Double {
-        ctx.PLUS()?.let { currentOperation = PLUS }
-        ctx.MINUS()?.let { currentOperation = MINUS }
+        currentOperation =
+            ctx.PLUS()?.let { PLUS } ?:
+            MINUS
         return 0.0 //Useless
     }
 
     override fun visitProductOp(ctx: MathParser.ProductOpContext): Double {
-        ctx.TIMES()?.let { currentOperation = TIMES }
-        ctx.DIV()?.let { currentOperation = DIV }
-        ctx.INT_DIV()?.let { currentOperation = INT_DIV }
-        ctx.REM()?.let { currentOperation = REM }
+        currentOperation =
+            ctx.DIV()?.let { DIV } ?:
+            ctx.INT_DIV()?.let { INT_DIV } ?:
+            ctx.REM()?.let { REM } ?:
+            TIMES
         return 0.0 //Useless
     }
 }
 
-typealias Operation = (Double, Double) -> Double
+typealias BinOp = (Double, Double) -> Double
+typealias Function = (Double) -> Double
 
-val PLUS: Operation = {x, y -> x + y}
-val MINUS: Operation = {x, y -> x - y}
-val TIMES: Operation = {x, y -> x * y}
-val DIV: Operation = {x, y -> x / y}
-val INT_DIV: Operation = {x, y -> (x.toInt() / y.toInt()).toDouble()}
-val REM: Operation = {x, y -> (x.toInt() % y.toInt()).toDouble()}
-val POW: Operation = {x, y -> x.pow(y) }
+val PLUS: BinOp = { x, y -> x + y}
+val MINUS: BinOp = { x, y -> x - y}
+val TIMES: BinOp = { x, y -> x * y}
+val DIV: BinOp = { x, y -> x / y}
+val INT_DIV: BinOp = { x, y -> (x.toInt() / y.toInt()).toDouble()}
+val REM: BinOp = { x, y -> (x.toInt() % y.toInt()).toDouble()}
+val POW: BinOp = { x, y -> x.pow(y) }
+
+fun log(base: Double): Function = { x -> log(x, base) }
