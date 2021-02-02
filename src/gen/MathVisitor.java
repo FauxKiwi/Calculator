@@ -94,6 +94,12 @@ public interface MathVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrimary(MathParser.PrimaryContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MathParser#absExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAbsExpression(MathParser.AbsExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MathParser#function}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

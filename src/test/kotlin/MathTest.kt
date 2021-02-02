@@ -7,7 +7,8 @@ fun main() {
     """.trimIndent()
 
     val program = """
-        print [1, 2] dot [3, 4]
+        v := [3, 4];
+        print |v|;
     """.trimIndent()
 
     val lexer = MathLexer(CharStreams.fromString(program))

@@ -1,6 +1,7 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 interface CalculatorValue/*<Self : CalculatorValue<Self>>*/ {
     operator fun plus(other: CalculatorValue): CalculatorValue
@@ -9,6 +10,7 @@ interface CalculatorValue/*<Self : CalculatorValue<Self>>*/ {
     operator fun div(other: CalculatorValue): CalculatorValue
     infix fun pow(other: CalculatorValue): CalculatorValue
     infix fun dot(other: CalculatorValue): CalculatorValue
+    fun abs(): CalculatorValue
 }
 
 inline class Number(val double: Double) : CalculatorValue {
@@ -18,16 +20,14 @@ inline class Number(val double: Double) : CalculatorValue {
     override operator fun minus(other: CalculatorValue) = Number(double - (other as Number).double)
     override operator fun times(other: CalculatorValue) = Number(double * (other as Number).double)
     override operator fun div(other: CalculatorValue) = Number(double / (other as Number).double)
-    override fun pow(other: CalculatorValue): CalculatorValue = Number(double.pow((other as Number).double))
-    override fun dot(other: CalculatorValue): CalculatorValue { error("Cannot divide Vectors") }
+    override fun pow(other: CalculatorValue) = Number(double.pow((other as Number).double))
+    override fun dot(other: CalculatorValue) = NoValue
+    override fun abs() = Number(kotlin.math.abs(double))
 
     override fun toString(): String = double.toString()
 }
 
 inline class Vector(val values: DoubleArray) : CalculatorValue {
-    /*@JvmName("varargConstructor")
-    constructor(vararg values: Double) : this(values)*/
-
     override operator fun plus(other: CalculatorValue) = Vector(values.addToEach((other as Vector).values))
     override operator fun minus(other: CalculatorValue) = Vector(values.subtractFromEach((other as Vector).values))
     override operator fun times(other: CalculatorValue) = when (other) {
@@ -41,7 +41,7 @@ inline class Vector(val values: DoubleArray) : CalculatorValue {
         )
         else -> error("Unknown Subclass")
     }
-    override fun div(other: CalculatorValue): CalculatorValue { error("Cannot divide Vectors") }
+    override fun div(other: CalculatorValue) = Vector(values.multiplyEachWith(1.0 / (other as Number).double))
     override infix fun dot(other: CalculatorValue): CalculatorValue {
         var ir = 0.0
         other as Vector
@@ -50,9 +50,26 @@ inline class Vector(val values: DoubleArray) : CalculatorValue {
         }
         return Number(ir)
     }
-    override fun pow(other: CalculatorValue): CalculatorValue { error("Cannot divide Vectors") }
+    override fun pow(other: CalculatorValue) = NoValue
+    override fun abs(): CalculatorValue {
+        var ir = 0.0
+        values.forEach {
+            ir += it*it
+        }
+        return Number(sqrt(ir))
+    }
 
     override fun toString(): String = values.joinToString(", ", "[", "]")
+}
+
+object NoValue : CalculatorValue {
+    override fun plus(other: CalculatorValue) = NoValue
+    override fun minus(other: CalculatorValue) = NoValue
+    override fun times(other: CalculatorValue) = NoValue
+    override fun div(other: CalculatorValue) = NoValue
+    override fun pow(other: CalculatorValue) = NoValue
+    override fun dot(other: CalculatorValue) = NoValue
+    override fun abs() = NoValue
 }
 
 inline fun DoubleArray.addToEach(other: DoubleArray): DoubleArray {

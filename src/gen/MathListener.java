@@ -147,6 +147,16 @@ public interface MathListener extends ParseTreeListener {
 	 */
 	void exitPrimary(MathParser.PrimaryContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MathParser#absExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterAbsExpression(MathParser.AbsExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MathParser#absExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitAbsExpression(MathParser.AbsExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MathParser#function}.
 	 * @param ctx the parse tree
 	 */

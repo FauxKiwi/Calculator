@@ -183,6 +183,18 @@ public class MathBaseListener implements MathListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAbsExpression(MathParser.AbsExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAbsExpression(MathParser.AbsExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterFunction(MathParser.FunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}

@@ -15,7 +15,7 @@ calculation
 // Statements
 
 statements
-    : statement (SEMI statement)* SEMI*
+    : (statement SEMI+)+
     ;
 
 statement
@@ -45,8 +45,8 @@ formalParameters
 
 // Expressions
 expression
-    : sum
-    | primary
+    : primary
+    | sum
     ;
 
 sum
@@ -68,9 +68,15 @@ power
 primary
     : (PLUS | MINUS)*
     ( LPAREN expression RPAREN
+    | absExpression
     | function
     | value
     ) postfix?
+    ;
+
+absExpression
+    : ABS LPAREN expression RPAREN
+    | PIPE expression PIPE
     ;
 
 function
@@ -83,7 +89,8 @@ parameters
     ;
 
 functionName
-    : SIN
+    : SQRT
+    | SIN
     | COS
     | TAN
     | log
@@ -148,6 +155,7 @@ COLON:          ':';
 ARROW:          '->' | '|->';
 COMMA:          ',';
 DOT:            '·';
+PIPE:           '|';
 
 SEMI:           ';';
 LPAREN:         '(';
@@ -168,6 +176,9 @@ LOG:            'log';
 LG:             'lg';
 LN:             'ln';
 EXP:            'e^';
+ABS:            'abs';
+SQRT:           'sqrt' | '√';
+
 PI:             'pi' | 'PI' | 'π';
 
 //RESERVED:       'log';

@@ -22,14 +22,14 @@ class Interpreter : MathVisitor<CalculatorValue> {
     }
 
     override fun visitProgram(ctx: MathParser.ProgramContext): CalculatorValue {
-        return ctx.statements()?.let(::visitStatements) ?: Number(Double.NaN)
+        return ctx.statements()?.let(::visitStatements) ?: NoValue
     }
 
     override fun visitCalculation(ctx: MathParser.CalculationContext): CalculatorValue =
         visitExpression(ctx.expression())
 
     override fun visitStatements(ctx: MathParser.StatementsContext): CalculatorValue {
-        var res: CalculatorValue = Number(Double.NaN)
+        var res: CalculatorValue = NoValue
         ctx.statement().forEach { res = visitStatement(it) }
         return res
     }
@@ -56,20 +56,20 @@ class Interpreter : MathVisitor<CalculatorValue> {
     override fun visitFunctionDeclaration(ctx: MathParser.FunctionDeclarationContext): CalculatorValue {
         visitFormalParameters(ctx.formalParameters())
         functions[ctx.IDENTIFIER().text] = DefinedFunction(ctx.expression(), currentFormalParameters)
-        return Number(Double.NaN)
+        return NoValue
     }
 
     override fun visitFormalParameters(ctx: MathParser.FormalParametersContext): CalculatorValue {
         currentFormalParameters = mutableListOf()
         ctx.IDENTIFIER().forEach { currentFormalParameters.add(it.text) }
-        return Number(Double.NaN)
+        return NoValue
     }
 
     override fun visitExpression(ctx: MathParser.ExpressionContext): CalculatorValue =
         ctx.sum()?.let(::visitSum) ?:
         visitPrimary(ctx.primary())
 
-    private var currentOperation: BinOp = { _, _ -> Number(Double.NaN)}
+    private var currentOperation: BinOp = { _, _ -> NoValue}
 
     override fun visitSum(ctx: MathParser.SumContext): CalculatorValue {
         var intermediate = visitDotProduct(ctx.dotProduct(0))
@@ -108,13 +108,17 @@ class Interpreter : MathVisitor<CalculatorValue> {
         val sign = Number(if(ctx.MINUS().size % 2 == 0) 1.0 else -1.0)
         val value =
             ctx.expression()?.let { visitExpression(it) } ?:
+            ctx.absExpression()?.let { visitAbsExpression(it) } ?:
             ctx.function()?.let { visitFunction(it) } ?:
             visitValue(ctx.value())
         val multiplier = ctx.postfix()?.let(::visitPostfix) ?: Number(1.0)
         return value * multiplier * sign
     }
 
-    private var currentFunction: Function = {Number(Double.NaN)}
+    override fun visitAbsExpression(ctx: MathParser.AbsExpressionContext): CalculatorValue =
+        visitExpression(ctx.expression()).abs()
+
+    private var currentFunction: Function = {NoValue}
     private var currentParameters = mutableListOf<CalculatorValue>()
 
     @Suppress("Unchecked_Cast")
@@ -141,11 +145,12 @@ class Interpreter : MathVisitor<CalculatorValue> {
     override fun visitParameters(ctx: MathParser.ParametersContext): CalculatorValue {
         currentParameters = mutableListOf()
         ctx.expression().forEach { currentParameters.add(visitExpression(it)) }
-        return Number(Double.NaN)
+        return NoValue
     }
 
     override fun visitFunctionName(ctx: MathParser.FunctionNameContext): CalculatorValue {
         currentFunction =
+            ctx.SQRT()?.let {{ Number(sqrt((it as Number).double)) }} ?:
             ctx.SIN()?.let {{ Number(sin((it as Number).double)) }} ?:
             ctx.COS()?.let {{ Number(sin((it as Number).double)) }} ?:
             ctx.TAN()?.let {{ Number(sin((it as Number).double)) }} ?:
@@ -153,7 +158,7 @@ class Interpreter : MathVisitor<CalculatorValue> {
             ctx.LG()?.let {{ Number(sin((it as Number).double)) }} ?:
             ctx.LN()?.let {{ Number(sin((it as Number).double)) }} ?:
             { Number(exp((it as Number).double)) }
-        return Number(Double.NaN)
+        return NoValue
     }
 
     override fun visitLog(ctx: MathParser.LogContext): CalculatorValue =
@@ -188,7 +193,7 @@ class Interpreter : MathVisitor<CalculatorValue> {
         currentOperation =
             ctx.PLUS()?.let { PLUS } ?:
             MINUS
-        return Number(Double.NaN)
+        return NoValue
     }
 
     override fun visitProductOp(ctx: MathParser.ProductOpContext): CalculatorValue {
@@ -197,7 +202,7 @@ class Interpreter : MathVisitor<CalculatorValue> {
             //ctx.INT_DIV()?.let { INT_DIV } ?:
             //ctx.REM()?.let { REM } ?:
             TIMES
-        return Number(Double.NaN)
+        return NoValue
     }
 }
 
