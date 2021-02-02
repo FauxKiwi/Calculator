@@ -1,16 +1,24 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.*
 
 interface CalculatorValue/*<Self : CalculatorValue<Self>>*/ {
-    operator fun plus(other: CalculatorValue): CalculatorValue
-    operator fun minus(other: CalculatorValue): CalculatorValue
-    operator fun times(other: CalculatorValue): CalculatorValue
-    operator fun div(other: CalculatorValue): CalculatorValue
-    infix fun pow(other: CalculatorValue): CalculatorValue
-    infix fun dot(other: CalculatorValue): CalculatorValue
-    fun abs(): CalculatorValue
+    operator fun plus(other: CalculatorValue): CalculatorValue = NoValue
+    operator fun minus(other: CalculatorValue): CalculatorValue = NoValue
+    operator fun times(other: CalculatorValue): CalculatorValue = NoValue
+    operator fun div(other: CalculatorValue): CalculatorValue = NoValue
+    infix fun pow(other: CalculatorValue): CalculatorValue = NoValue
+    infix fun dot(other: CalculatorValue): CalculatorValue = NoValue
+    fun abs(): CalculatorValue = NoValue
+
+    fun sqrt(): CalculatorValue = NoValue
+    fun sin(): CalculatorValue = NoValue
+    fun cos(): CalculatorValue = NoValue
+    fun tan(): CalculatorValue = NoValue
+    fun log(base: CalculatorValue): CalculatorValue = NoValue
+    fun lg(): CalculatorValue = NoValue
+    fun ln(): CalculatorValue = NoValue
+    fun exp(): CalculatorValue = NoValue
 }
 
 inline class Number(val double: Double) : CalculatorValue {
@@ -21,8 +29,16 @@ inline class Number(val double: Double) : CalculatorValue {
     override operator fun times(other: CalculatorValue) = Number(double * (other as Number).double)
     override operator fun div(other: CalculatorValue) = Number(double / (other as Number).double)
     override fun pow(other: CalculatorValue) = Number(double.pow((other as Number).double))
-    override fun dot(other: CalculatorValue) = NoValue
-    override fun abs() = Number(kotlin.math.abs(double))
+    override fun abs() = Number(abs(double))
+
+    override fun sqrt(): CalculatorValue = Number(sqrt(double))
+    override fun sin(): CalculatorValue = Number(sin(double))
+    override fun cos(): CalculatorValue = Number(cos(double))
+    override fun tan(): CalculatorValue = Number(tan(double))
+    override fun log(base: CalculatorValue): CalculatorValue = Number(log(double, (base as Number).double))
+    override fun lg(): CalculatorValue = Number(log10(double))
+    override fun ln(): CalculatorValue = Number(ln(double))
+    override fun exp(): CalculatorValue = Number(exp(double))
 
     override fun toString(): String = double.toString()
 }
@@ -50,7 +66,6 @@ inline class Vector(val values: DoubleArray) : CalculatorValue {
         }
         return Number(ir)
     }
-    override fun pow(other: CalculatorValue) = NoValue
     override fun abs(): CalculatorValue {
         var ir = 0.0
         values.forEach {
@@ -62,15 +77,7 @@ inline class Vector(val values: DoubleArray) : CalculatorValue {
     override fun toString(): String = values.joinToString(", ", "[", "]")
 }
 
-object NoValue : CalculatorValue {
-    override fun plus(other: CalculatorValue) = NoValue
-    override fun minus(other: CalculatorValue) = NoValue
-    override fun times(other: CalculatorValue) = NoValue
-    override fun div(other: CalculatorValue) = NoValue
-    override fun pow(other: CalculatorValue) = NoValue
-    override fun dot(other: CalculatorValue) = NoValue
-    override fun abs() = NoValue
-}
+object NoValue : CalculatorValue
 
 inline fun DoubleArray.addToEach(other: DoubleArray): DoubleArray {
     return DoubleArray(size) { i ->

@@ -115,12 +115,17 @@ postfix
 value
     : NUMBER
     | vector
+    | collection
     | constant
     | IDENTIFIER
     ;
 
 vector
     : LSQUARE primary (COMMA primary)* RSQUARE
+    ;
+
+collection
+    : LBRACE primary (COMMA primary)* RBRACE
     ;
 
 constant
@@ -156,12 +161,15 @@ ARROW:          '->' | '|->';
 COMMA:          ',';
 DOT:            '·';
 PIPE:           '|';
+PLUSMINUS:      '[+-]' | '±';
 
 SEMI:           ';';
 LPAREN:         '(';
 RPAREN:         ')';
 LSQUARE:        '[';
 RSQUARE:        ']';
+LBRACE:         '{';
+RBRACE:         '}';
 
 DEGREES:        '°';
 PERCENT:        '%';

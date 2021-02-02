@@ -150,14 +150,14 @@ class Interpreter : MathVisitor<CalculatorValue> {
 
     override fun visitFunctionName(ctx: MathParser.FunctionNameContext): CalculatorValue {
         currentFunction =
-            ctx.SQRT()?.let {{ Number(sqrt((it as Number).double)) }} ?:
-            ctx.SIN()?.let {{ Number(sin((it as Number).double)) }} ?:
-            ctx.COS()?.let {{ Number(sin((it as Number).double)) }} ?:
-            ctx.TAN()?.let {{ Number(sin((it as Number).double)) }} ?:
-            ctx.log()?.let { log(visitLog(it)) } ?:
-            ctx.LG()?.let {{ Number(sin((it as Number).double)) }} ?:
-            ctx.LN()?.let {{ Number(sin((it as Number).double)) }} ?:
-            { Number(exp((it as Number).double)) }
+            ctx.SQRT()?.let {{it.sqrt()}} ?:
+            ctx.SIN()?.let {{it.sin()}} ?:
+            ctx.COS()?.let {{it.cos()}} ?:
+            ctx.TAN()?.let {{it.tan()}} ?:
+            ctx.log()?.let {l->{it.log(visitLog(l))}} ?:
+            ctx.LG()?.let {{it.lg()}} ?:
+            ctx.LN()?.let {{it.ln()}} ?:
+            {it.exp()}
         return NoValue
     }
 
